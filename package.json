@@ -1,0 +1,20 @@
+{
+	"name": "arweave-wallet-connector-node",
+	"version": "0.0.0",
+	"description": "Use arweave wallet websites inside node.js applications",
+	"type": "module",
+	"main": "index.js",
+	"scripts": {
+		"run": "tsc"
+	},
+	"dependencies": {
+		"arweave-wallet-connector": "^0.0.25",
+		"open": "^8.4.0",
+		"ws": "^8.5.0"
+	},
+	"devDependencies": {
+		"@types/ws": "^8.5.3",
+		"esbuild": "^0.14.27",
+		"typescript": "^4.6.2"
+	}
+}
