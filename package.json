@@ -5,7 +5,8 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"run": "tsc"
+		"build": "tsc",
+		"run": "npm run build && node lib/index.js"
 	},
 	"dependencies": {
 		"arweave-wallet-connector": "^0.0.25",
