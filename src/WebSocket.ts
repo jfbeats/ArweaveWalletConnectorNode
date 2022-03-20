@@ -25,6 +25,7 @@ export default class WebSocketsConnection implements Connection {
 		this._url = generateUrl(connectToUrl)
 		const urlInfo = {
 			origin: 'ws://localhost:' + this._serverPort,
+			session: Math.random().toString().slice(2)
 		} as any
 		if (appInfo?.name) { urlInfo.name = appInfo.name }
 		if (appInfo?.logo) { urlInfo.logo = appInfo.logo }
@@ -52,7 +53,7 @@ export default class WebSocketsConnection implements Connection {
 			})
 		})
 		
-		open(this._url.href)
+		open(this._url.toString())
 	}
 
 	disconnect() {
