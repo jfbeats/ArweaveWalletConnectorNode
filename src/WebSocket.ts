@@ -32,7 +32,7 @@ export default class WebSocketsConnection implements Connection {
 		this._url.hash = new URLSearchParams(urlInfo).toString()
 	}
 
-	connect() {
+	async connect() {
 		if (this._wss) { return }
 		
 		const promise = new Promise((resolve, reject) => this._channelController = { resolve, reject })
@@ -54,6 +54,7 @@ export default class WebSocketsConnection implements Connection {
 		})
 		
 		open(this._url.toString())
+		return this._channelController.promise
 	}
 
 	disconnect() {
@@ -64,7 +65,7 @@ export default class WebSocketsConnection implements Connection {
 		this._ws = undefined
 	}
 
-	postMessage(method: string, params?: any[], options?: PostMessageOptions & ProtocolInfo) {
+	async postMessage(method: string, params?: any[], options?: PostMessageOptions & ProtocolInfo) {
 		if (!this._ws) { throw 'no connection' }
 		const message = { method, params, protocol: options?.protocol, version: options?.version, jsonrpc: '2.0' }
 		const promise = this._promiseController.newMessagePromise(message, options)
