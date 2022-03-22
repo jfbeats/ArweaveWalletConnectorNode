@@ -1,6 +1,6 @@
 {
 	"name": "arweave-wallet-connector-node",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Use arweave wallet websites inside node.js applications",
 	"type": "module",
 	"module": "lib/index.js",
