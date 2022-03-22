@@ -1,6 +1,6 @@
 # Arweave Wallet Connector for Node.js Applications
 
-See the [Arweave Wallet Connector](https://github.com/jfbeats/ArweaveWalletConnector) for more information. The arweave interface is the same.
+Let you connect to wallet provider websites and sign transactions in node.js CLI, servers, utilities, etc. See [Arweave Wallet Connector](https://github.com/jfbeats/ArweaveWalletConnector) for more information. The arweave specific api is the same as the browser connector. Native applications can also use a local WebSocket server to connect to wallet providers like [arweave.app](https://arweave.app)
 
 ## How to use
 
@@ -23,6 +23,6 @@ const yourApplicationInfo = { // Optional
 
 const wallet = new ArweaveWebSockets(providerURL, yourApplicationInfo)
 
-await wallet.connect()
+const address = await wallet.connect()
 await wallet.signTransaction(arweaveJsTransactionObject)
 ```

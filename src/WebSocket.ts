@@ -2,9 +2,8 @@ import { PromiseController } from 'arweave-wallet-connector/lib/utils/PromiseCon
 import { generateUrl } from 'arweave-wallet-connector/lib/utils/Utils.js'
 import type { Connection, PostMessageOptions, ProtocolInfo, AppInfo } from 'arweave-wallet-connector/lib/types'
 
-import { WebSocketServer } from 'ws'
+import WebSocket, { WebSocketServer } from 'ws'
 import open from 'open'
-import type { WebSocket } from 'ws'
 
 type ChannelController = {
 	promise?: Promise<unknown>,
@@ -32,8 +31,11 @@ export default class WebSocketsConnection implements Connection {
 		this._url.hash = new URLSearchParams(urlInfo).toString()
 	}
 
-	async connect() {
+	async connect(): Promise<string | undefined> {
 		if (this._wss) { return }
+
+		let addressResolve: (val: string) => void
+		const addressPromise = new Promise<string>(resolve => addressResolve = resolve)
 		
 		const promise = new Promise((resolve, reject) => this._channelController = { resolve, reject })
 		this._channelController.promise = promise
@@ -44,17 +46,18 @@ export default class WebSocketsConnection implements Connection {
 			this._ws = ws
 			ws.on('message', data => {
 				const message = JSON.parse(data.toString())
-				console.log('received: %s', message)
 				if (typeof data !== 'object') { return }
 				if (this._promiseController.processResponse(message)) { return }
 				const { method, params, id, result, error, session } = message as { [key: string]: unknown }
 				if (typeof method !== 'string') { return }
-				if (method === 'connect') { this._channelController?.resolve?.() }
+				if (method !== 'connect' || typeof params !== 'string') { return }
+				this._channelController?.resolve?.()
+				addressResolve(params)
 			})
 		})
 		
 		open(this._url.toString())
-		return this._channelController.promise
+		return addressPromise
 	}
 
 	disconnect() {
@@ -75,7 +78,7 @@ export default class WebSocketsConnection implements Connection {
 	
 	private deliverMessage (message: any, options?: PostMessageOptions) {
 		this._channelController.promise = this._channelController?.promise
-			?.then(() => this._ws?.send(JSON.stringify(message)))
+			?.then(() => this._wss?.clients.forEach(ws => ws.readyState === WebSocket.OPEN && ws.send(JSON.stringify(message))))
 			.catch(() => { return })
 	}
 }
