@@ -15,7 +15,6 @@ export default class WebSocketsConnection implements Connection {
 	private _url: URL
 	private _serverPort: number
 	private _wss?: WebSocketServer
-	private _ws?: WebSocket
 	private _channelController: ChannelController = {}
 	private _promiseController = new PromiseController()
 
@@ -42,8 +41,6 @@ export default class WebSocketsConnection implements Connection {
 		
 		this._wss = new WebSocketServer({ port: this._serverPort })
 		this._wss.on('connection', ws => {
-			if (this._ws) { return }
-			this._ws = ws
 			ws.on('message', data => {
 				const message = JSON.parse(data.toString())
 				if (typeof data !== 'object') { return }
@@ -63,13 +60,11 @@ export default class WebSocketsConnection implements Connection {
 	disconnect() {
 		this._channelController?.reject?.()
 		this._wss?.close()
-		this._ws?.close()
 		this._wss = undefined
-		this._ws = undefined
 	}
 
 	async postMessage(method: string, params?: any[], options?: PostMessageOptions & ProtocolInfo) {
-		if (!this._ws) { throw 'no connection' }
+		if (!this._wss) { throw 'no connection' }
 		const message = { method, params, protocol: options?.protocol, version: options?.version, jsonrpc: '2.0' }
 		const promise = this._promiseController.newMessagePromise(message, options)
 		this.deliverMessage(message, options)
